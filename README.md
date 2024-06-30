@@ -23,7 +23,7 @@ Typing Genius👨🏻‍💻 is an educational typing game where you can improve
 
 ## 🎮 Try It Out
 
-You can play Typing Genius👨🏻‍💻 [here](#link-to-your-hosted-game).
+You can play Typing Genius👨🏻‍💻 [here](https://royalpanditofficial.github.io/Typing-Genius/).
 
 ## 🌟 Features
 
