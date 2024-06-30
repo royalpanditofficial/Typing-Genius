@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Genius👨🏻‍💻</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .game-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 2.5em;
+            color: #b76e79; /* Rose gold color */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* Text shadow */
+        }
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        #word {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        #input {
+            font-size: 1.5em;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 300px;
+            text-align: center;
+            border: 2px solid #ffc0cb; /* Pink border */
+            border-radius: 5px;
+            outline: none;
+        }
+        #score {
+            font-size: 1.5em;
+            color: #b76e79; /* Rose gold color */
+            margin-bottom: 10px;
+        }
+        #timer {
+            font-size: 1.5em;
+            color: #e53935; /* Red color */
+            margin-top: 10px;
+        }
+        .button {
+            background-color: #c0c0c0; /* Silver color */
+            color: #333; /* Dark gray text */
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .button:hover {
+            background-color: #a9a9a9; /* Darker silver color */
+        }
+        .made-by {
+            position: absolute;
+            bottom: -40px; /* Adjusted bottom position */
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 100%;
+            font-size: 1.2em; /* Font size increased */
+            font-weight: bold; /* Bold font */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fancy font */
+            color: #b76e79; /* Rose gold color */
+            z-index: 1; /* Ensures it's above other elements */
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Typing Genius👨🏻‍💻</h1>
+        <p>Type the words related to learning and education!</p>
+        <div id="word">-</div>
+        <input type="text" id="input" autocomplete="off" placeholder="Type here..." disabled>
+        <div id="score">Score: 0</div>
+        <div id="timer">Time left: <span id="time">60</span> seconds</div>
+        <button class="button" id="startButton">Start</button>
+        <button class="button" id="stopButton" style="display: none;">Stop</button>
+    </div>
+
+    <div class="made-by">
+        Made by Satyam ❤️
+    </div>
+
+    <script>
+        const keywords = [
+            'learn', 'study', 'teach', 'knowledge', 'book', 'student', 'teacher', 'school', 'class', 'education',
+            'computer', 'programming', 'software', 'hardware', 'network', 'internet', 'database', 'algorithm', 
+            'security', 'encryption', 'artificial intelligence', 'machine learning', 'data science', 'cloud computing', 
+            'web development', 'mobile app', 'cybersecurity', 'robotics', 'virtual reality', 'augmented reality', 
+            'blockchain', 'digital transformation', 'big data', 'IoT', 'operating system', 'user interface', 'server',
+            'developer', 'code', 'debugging', 'API', 'framework', 'interface', 'graphics', 'storage', 'memory', 'CPU',
+            'input', 'output', 'mouse', 'keyboard', 'monitor', 'laptop', 'desktop', 'tablet', 'smartphone', 'server',
+            'router', 'firewall', 'authentication', 'authorization', 'encryption', 'decryption', 'backup', 'restore'
+        ];
+
+        let currentWord;
+        let score = 0;
+        let timeLeft = 60; // Changed to 60 seconds
+        let timer;
+        let gameRunning = false;
+
+        const wordElement = document.getElementById('word');
+        const inputElement = document.getElementById('input');
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('time');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+
+        startButton.addEventListener('click', startGame);
+        stopButton.addEventListener('click', stopGame);
+
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                startButton.style.display = 'none';
+                stopButton.style.display = 'inline-block';
+                inputElement.disabled = false;
+
+                showWord();
+                inputElement.focus();
+                inputElement.addEventListener('input', checkInput);
+                timer = setInterval(updateTime, 1000);
+            }
+        }
+
+        function stopGame() {
+            gameRunning = false;
+            clearInterval(timer);
+            startButton.style.display = 'inline-block';
+            stopButton.style.display = 'none';
+            inputElement.disabled = true;
+
+            const wpm = calculateWPM();
+            const accuracy = calculateAccuracy();
+            alert(`Game Over!\n\nWords per Minute (WPM): ${wpm}\nAccuracy: ${accuracy}%`);
+            resetGame();
+        }
+
+        function showWord() {
+            currentWord = keywords[Math.floor(Math.random() * keywords.length)];
+            wordElement.textContent = currentWord;
+        }
+
+        function checkInput() {
+            const userInput = inputElement.value.trim();
+            if (userInput.toLowerCase() === currentWord.toLowerCase()) {
+                score++;
+                scoreElement.textContent = `Score: ${score}`;
+                inputElement.value = '';
+                showWord();
+            }
+        }
+
+        function updateTime() {
+            timeLeft--;
+            timeElement.textContent = timeLeft;
+            if (timeLeft === 0) {
+                stopGame();
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 60; // Reset time to 60 seconds
+            scoreElement.textContent = `Score: ${score}`;
+            timeElement.textContent = timeLeft;
+            inputElement.value = '';
+        }
+
+        function calculateWPM() {
+            const wordsTyped = score;
+            const minutes = 1; // 1 minute game
+            const wpm = Math.round(wordsTyped / minutes);
+            return wpm;
+        }
+
+        function calculateAccuracy() {
+            const totalWordsTyped = score;
+            const totalCharactersTyped = totalWordsTyped * 5; // Assuming each word has 5 characters on average
+            const userInput = inputElement.value.trim();
+            const charactersCorrect = userInput.length;
+            const accuracyPercentage = Math.round((charactersCorrect / totalCharactersTyped) * 100);
+            return accuracyPercentage;
+        }
+    </script>
+</body>
+</html>
